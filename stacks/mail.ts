@@ -71,14 +71,16 @@ export default Alchemy.Stack(
         name: domain.name,
         zoneId: domain.zoneId,
       }).pipe(RemovalPolicy.retain());
-      yield* Cloudflare.DNS.Record(`Dmarc-${id}`, {
-        // Monitor first; tighten to quarantine once reports show only Cloudflare sending.
-        content: '"v=DMARC1; p=none; adkim=r; aspf=r"',
-        name: `_dmarc.${domain.name}`,
-        ttl: 1,
-        type: "TXT",
-        zoneId: domain.zoneId,
-      });
+      if (domain.ownsDmarc) {
+        yield* Cloudflare.DNS.Record(`Dmarc-${id}`, {
+          // Monitor first; tighten to quarantine once reports show only Cloudflare sending.
+          content: '"v=DMARC1; p=none; adkim=r; aspf=r"',
+          name: `_dmarc.${domain.name}`,
+          ttl: 1,
+          type: "TXT",
+          zoneId: domain.zoneId,
+        });
+      }
       zones.push({ ...domain, id });
     }
 

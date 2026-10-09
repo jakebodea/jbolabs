@@ -51,6 +51,10 @@ export const mailflare = {
  * token's scope is known at plan time (zones are owned by `studio.ts`, the
  * pcobooster repo and the shouldertap repo respectively).
  *
+ * `ownsDmarc`: whether `stacks/mail.ts` publishes the zone's `_dmarc` record.
+ * shouldertap.app already has one (`p=reject`, set outside Alchemy before
+ * Mailflare), and a second record would make DMARC invalid for the domain.
+ *
  * `ownsRouting`: whether `stacks/mail.ts` enables Email Routing on the zone.
  * jbolabs.com's routing belongs to `stacks/studio.ts`, so mail only claims its
  * catch-all.
@@ -62,16 +66,19 @@ export const mailflare = {
 export const mailDomains = [
   {
     name: "jbolabs.com",
+    ownsDmarc: true,
     ownsRouting: false,
     zoneId: "333c7cb3be883e897fae5012d82f7091",
   },
   {
     name: "pcobooster.com",
+    ownsDmarc: true,
     ownsRouting: true,
     zoneId: "a43fafd2bb6e6fb47f0233e6168e622e",
   },
   {
     name: "shouldertap.app",
+    ownsDmarc: false,
     ownsRouting: true,
     zoneId: "67ca54dc8d4b36bf46486ad14875914d",
   },
