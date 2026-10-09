@@ -4,12 +4,13 @@ interface TurnstileApi {
   readonly render: (
     element: HTMLElement,
     options: {
+      appearance: "always" | "execute" | "interaction-only";
       sitekey: string;
       callback: (token: string) => void;
       "expired-callback": () => void;
       "error-callback": () => void;
       size: "flexible";
-      theme: "light";
+      theme: "light" | "dark";
     }
   ) => string;
   readonly remove: (widgetId: string) => void;
