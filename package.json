@@ -1,0 +1,23 @@
+{
+  "name": "jbolabs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "cd mailflare && npm ci --no-audit --no-fund && npm run build",
+    "plan:studio": "alchemy plan stacks/studio.ts --stage shared",
+    "deploy:studio": "alchemy deploy stacks/studio.ts --stage shared",
+    "plan:mail": "bun run build && alchemy plan stacks/mail.ts --stage prod",
+    "deploy:mail": "bun run build && alchemy deploy stacks/mail.ts --stage prod",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "1.4.2",
+    "alchemy": "2.0.0-beta.80",
+    "effect": "4.0.0",
+    "typescript": "5.9.3"
+  },
+  "engines": {
+    "bun": ">=1.4.2"
+  },
+  "packageManager": "bun@1.4.2"
+}
