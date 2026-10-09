@@ -25,6 +25,7 @@ import { BUDGETS, SERVICES, TIMELINES } from "@/lib/intake-options";
 import { currentReferrer } from "@/lib/referral";
 import { cn } from "@/lib/utils";
 
+import { AutoHeight } from "./auto-height";
 import { loadTurnstile } from "./turnstile";
 
 interface ContactFormProps {
@@ -137,6 +138,29 @@ const invalidProps = (errors: Errors, name: string, id: string) =>
     ? {}
     : { "aria-describedby": `${id}-error`, "aria-invalid": true };
 
+/**
+ * A field's error, opening and closing in place. While it closes it keeps
+ * showing the last message, so the text does not vanish before the space does.
+ */
+const FieldMessage = ({
+  id,
+  message,
+}: {
+  readonly id: string;
+  readonly message: string | undefined;
+}) => {
+  const [last, setLast] = useState(message);
+  if (message !== undefined && message !== last) {
+    setLast(message);
+  }
+  const open = message !== undefined;
+  return (
+    <div className="field-reveal" data-open={open} aria-hidden={!open}>
+      <FieldError id={id}>{message ?? last}</FieldError>
+    </div>
+  );
+};
+
 /** A step slides in from the side it lies on: from the right going forward, from the left going back. */
 const Step = ({
   index,
@@ -234,9 +258,7 @@ const ProjectFields = ({ errors }: { readonly errors: Errors }) => (
         placeholder="What are you hoping to build or change, and what does success look like?"
         {...invalidProps(errors, "message", "intake-message")}
       />
-      {errors.message !== undefined && (
-        <FieldError id="intake-message-error">{errors.message}</FieldError>
-      )}
+      <FieldMessage id="intake-message-error" message={errors.message} />
     </Field>
   </FieldGroup>
 );
@@ -295,9 +317,7 @@ const AboutFields = ({
           size="lg"
           {...invalidProps(errors, "name", "intake-name")}
         />
-        {errors.name !== undefined && (
-          <FieldError id="intake-name-error">{errors.name}</FieldError>
-        )}
+        <FieldMessage id="intake-name-error" message={errors.name} />
       </Field>
       <Field data-invalid={errors.email !== undefined}>
         <FieldLabel htmlFor="intake-email">Email</FieldLabel>
@@ -312,9 +332,7 @@ const AboutFields = ({
           placeholder="you@company.com"
           {...invalidProps(errors, "email", "intake-email")}
         />
-        {errors.email !== undefined && (
-          <FieldError id="intake-email-error">{errors.email}</FieldError>
-        )}
+        <FieldMessage id="intake-email-error" message={errors.email} />
       </Field>
       <Field>
         <FieldLabel htmlFor="intake-company">
@@ -645,7 +663,11 @@ const ContactForm = ({ turnstileSiteKey }: ContactFormProps) => {
   };
 
   if (status.state === "sent") {
-    return <Sent name={status.name} email={status.email} sentRef={reveal} />;
+    return (
+      <AutoHeight>
+        <Sent name={status.name} email={status.email} sentRef={reveal} />
+      </AutoHeight>
+    );
   }
 
   const sending = status.state === "sending";
@@ -653,92 +675,106 @@ const ContactForm = ({ turnstileSiteKey }: ContactFormProps) => {
   const stepRef = (index: number) => (element: HTMLElement | null) => {
     steps.current[index] = element;
   };
+  // Both returns share the AutoHeight root, so the card glides from the form
+  // to the thank-you note.
   return (
-    <form
-      onSubmit={(event) => {
-        void onSubmit(event);
-      }}
-      onInput={(event) => {
-        fields.recheck(event.target);
-      }}
-      onChange={(event) => {
-        const name = validatedTarget(event.target)?.name;
-        if (name === "budget" || name === "timeline") {
-          setAnsweredBudget(true);
-        }
-      }}
-      noValidate
-      className="flex flex-col gap-10"
-    >
-      <Progress current={current} />
+    <AutoHeight>
+      <form
+        onSubmit={(event) => {
+          void onSubmit(event);
+        }}
+        onInput={(event) => {
+          fields.recheck(event.target);
+        }}
+        onChange={(event) => {
+          const name = validatedTarget(event.target)?.name;
+          if (name === "budget" || name === "timeline") {
+            setAnsweredBudget(true);
+          }
+        }}
+        noValidate
+        className="flex flex-col gap-10"
+      >
+        <Progress current={current} />
 
-      <Step index={0} current={current} back={back} stepRef={stepRef(0)}>
-        <ProjectFields errors={fields.errors} />
-      </Step>
+        <Step index={0} current={current} back={back} stepRef={stepRef(0)}>
+          <ProjectFields errors={fields.errors} />
+        </Step>
 
-      <Step index={1} current={current} back={back} stepRef={stepRef(1)}>
-        <BudgetFields />
-      </Step>
+        <Step index={1} current={current} back={back} stepRef={stepRef(1)}>
+          <BudgetFields />
+        </Step>
 
-      <Step index={2} current={current} back={back} stepRef={stepRef(2)}>
-        <AboutFields
-          errors={fields.errors}
-          referrerRef={referrer}
-          widgetRef={spam.widget}
-        />
-      </Step>
+        <Step index={2} current={current} back={back} stepRef={stepRef(2)}>
+          <AboutFields
+            errors={fields.errors}
+            referrerRef={referrer}
+            widgetRef={spam.widget}
+          />
+        </Step>
 
-      <div className="flex flex-col gap-4">
-        {failure !== null && (
-          <div className="animate-in fade-in duration-200 ease-out">
-            <FieldError>{failure}</FieldError>
+        <div className="flex flex-col gap-4">
+          {failure !== null && (
+            <div className="animate-in fade-in duration-200 ease-out">
+              <FieldError>{failure}</FieldError>
+            </div>
+          )}
+          <div className="flex gap-3">
+            <div
+              className="inline-reveal"
+              data-open={current > 0}
+              inert={current === 0}
+            >
+              {/* A plain box can shrink to nothing; the button's own padding cannot. */}
+              <div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="hero"
+                  onClick={() => {
+                    fields.clear();
+                    goTo(current - 1);
+                  }}
+                  disabled={sending}
+                >
+                  <ArrowLeftIcon aria-hidden="true" />
+                  Back
+                </Button>
+              </div>
+            </div>
+            {current < LAST ? (
+              <Button
+                key="next"
+                type="button"
+                size="hero"
+                className="flex-1"
+                onClick={next}
+              >
+                {current === 1 && !answeredBudget ? "Skip" : "Next"}
+                <ArrowRightIcon aria-hidden="true" />
+              </Button>
+            ) : (
+              <Button
+                key="send"
+                type="submit"
+                size="hero"
+                className="flex-1"
+                disabled={sending}
+              >
+                {sending && (
+                  <LoaderCircleIcon
+                    className="animate-spin"
+                    aria-hidden="true"
+                  />
+                )}
+                {sending ? "Sending" : "Send enquiry"}
+                {!sending && <ArrowRightIcon aria-hidden="true" />}
+              </Button>
+            )}
           </div>
-        )}
-        <div className="flex gap-3">
-          {current > 0 && (
-            <Button
-              type="button"
-              variant="outline"
-              size="hero"
-              onClick={() => {
-                fields.clear();
-                goTo(current - 1);
-              }}
-              disabled={sending}
-            >
-              <ArrowLeftIcon aria-hidden="true" />
-              Back
-            </Button>
-          )}
-          {current < LAST ? (
-            <Button
-              key="next"
-              type="button"
-              size="hero"
-              className="flex-1"
-              onClick={next}
-            >
-              {current === 1 && !answeredBudget ? "Skip" : "Next"}
-              <ArrowRightIcon aria-hidden="true" />
-            </Button>
-          ) : (
-            <Button
-              key="send"
-              type="submit"
-              size="hero"
-              className="flex-1"
-              disabled={sending}
-            >
-              {sending && (
-                <LoaderCircleIcon className="animate-spin" aria-hidden="true" />
-              )}
-              {sending ? "Sending" : "Send enquiry"}
-              {!sending && <ArrowRightIcon aria-hidden="true" />}
-            </Button>
-          )}
         </div>
-      </div>
-    </form>
+      </form>
+    </AutoHeight>
   );
 };
 
