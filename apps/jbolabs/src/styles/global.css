@@ -70,6 +70,8 @@
   --font-mono: var(--font-label), ui-monospace, monospace;
 
   --ease-out-expo: cubic-bezier(0.23, 1, 0.32, 1);
+  /* A small settle past the target, kept for rare celebratory moments (the contact form's success check). */
+  --ease-overshoot: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
@@ -111,6 +113,8 @@
   html {
     -webkit-text-size-adjust: 100%;
     scroll-padding-top: 6rem;
+    /* Lets the FAQ answers transition to `height: auto`. */
+    interpolate-size: allow-keywords;
 
     @media (prefers-reduced-motion: no-preference) {
       scroll-behavior: smooth;
@@ -251,5 +255,12 @@ html[data-nav-open] header {
 @media (prefers-reduced-motion: reduce) {
   .rise {
     animation: none;
+  }
+
+  /* tw-animate-css entrances (contact form steps, success, errors) keep their fade but stop moving. */
+  .animate-in {
+    --tw-enter-translate-x: 0;
+    --tw-enter-translate-y: 0;
+    --tw-enter-scale: 1;
   }
 }

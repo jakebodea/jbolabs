@@ -80,14 +80,17 @@ const stepIsValid = (step: HTMLElement | null) => {
   return invalid === undefined;
 };
 
+/** A step slides in from the side it lies on: from the right going forward, from the left going back. */
 const Step = ({
   index,
   current,
+  back,
   stepRef,
   children,
 }: {
   readonly index: number;
   readonly current: number;
+  readonly back: boolean;
   readonly stepRef: (element: HTMLElement | null) => void;
   readonly children: ReactNode;
 }) => (
@@ -95,7 +98,10 @@ const Step = ({
     ref={stepRef}
     hidden={index !== current}
     aria-labelledby={`intake-step-${index}`}
-    className="animate-in fade-in slide-in-from-right-3 flex flex-col gap-8 duration-300"
+    className={cn(
+      "animate-in fade-in ease-out-expo flex flex-col gap-8 duration-250",
+      back ? "slide-in-from-left-3" : "slide-in-from-right-3"
+    )}
   >
     <h2
       id={`intake-step-${index}`}
@@ -278,6 +284,7 @@ const ContactForm = ({ turnstileSiteKey }: ContactFormProps) => {
   const [status, setStatus] = useState<Status>({ state: "idle" });
   const [token, setToken] = useState("");
   const [current, setCurrent] = useState(0);
+  const [back, setBack] = useState(false);
   // The spam check mounts once the last step is first shown: Turnstile cannot
   // size itself inside a hidden container.
   const [reachedEnd, setReachedEnd] = useState(false);
@@ -344,6 +351,7 @@ const ContactForm = ({ turnstileSiteKey }: ContactFormProps) => {
 
   const goTo = (index: number) => {
     moved.current = true;
+    setBack(index < current);
     setCurrent(index);
     if (index === LAST) {
       setReachedEnd(true);
@@ -396,18 +404,20 @@ const ContactForm = ({ turnstileSiteKey }: ContactFormProps) => {
 
   if (status.state === "sent") {
     return (
+      // The one moment the form exists for: a short staggered entrance, with a
+      // small overshoot on the check.
       <output className="flex flex-col items-start gap-5 py-6 sm:py-10">
         <span
-          className="bg-signal-soft text-signal flex size-12 items-center justify-center rounded-full"
+          className="bg-signal-soft text-signal animate-in fade-in zoom-in-75 fill-mode-both ease-overshoot flex size-12 items-center justify-center rounded-full delay-100 duration-400"
           aria-hidden="true"
         >
           <CheckIcon className="size-5" strokeWidth={2.5} />
         </span>
-        <h2 className="display text-4xl leading-tight sm:text-5xl">
+        <h2 className="display animate-in fade-in slide-in-from-bottom-2 fill-mode-both ease-out-expo text-4xl leading-tight delay-60 duration-500 sm:text-5xl">
           Thank you.{" "}
           <strong className="headline-strong">Your note is in.</strong>
         </h2>
-        <p className="text-muted-foreground max-w-md text-lg leading-relaxed">
+        <p className="text-muted-foreground animate-in fade-in slide-in-from-bottom-2 fill-mode-both ease-out-expo max-w-md text-lg leading-relaxed delay-120 duration-500">
           I read every enquiry personally and will reply by email within two
           business days.
         </p>
@@ -429,20 +439,24 @@ const ContactForm = ({ turnstileSiteKey }: ContactFormProps) => {
     >
       <Progress current={current} />
 
-      <Step index={0} current={current} stepRef={stepRef(0)}>
+      <Step index={0} current={current} back={back} stepRef={stepRef(0)}>
         <ProjectFields />
       </Step>
 
-      <Step index={1} current={current} stepRef={stepRef(1)}>
+      <Step index={1} current={current} back={back} stepRef={stepRef(1)}>
         <BudgetFields />
       </Step>
 
-      <Step index={2} current={current} stepRef={stepRef(2)}>
+      <Step index={2} current={current} back={back} stepRef={stepRef(2)}>
         <AboutFields referrerRef={referrer} widgetRef={widget} />
       </Step>
 
       <div className="flex flex-col gap-4">
-        {status.state === "error" && <FieldError>{status.message}</FieldError>}
+        {status.state === "error" && (
+          <div className="animate-in fade-in duration-200 ease-out">
+            <FieldError>{status.message}</FieldError>
+          </div>
+        )}
         <div className="flex gap-3">
           {current > 0 && (
             <Button
