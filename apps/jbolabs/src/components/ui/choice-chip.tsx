@@ -19,7 +19,7 @@ function ChoiceChip({
     <label
       data-slot="choice-chip"
       className={cn(
-        "border-input bg-card text-foreground/80 hover:border-foreground/30 has-checked:border-foreground has-checked:bg-foreground has-checked:text-background has-focus-visible:ring-ring/50 inline-flex min-h-10 cursor-pointer items-center rounded-full border px-4 text-sm transition-colors select-none has-focus-visible:ring-3 has-disabled:cursor-not-allowed has-disabled:opacity-50",
+        "border-input bg-card text-foreground/80 hover:border-foreground/30 has-checked:border-foreground has-checked:bg-foreground has-checked:text-background has-focus-visible:ring-ring/50 inline-flex min-h-10 cursor-pointer items-center rounded-full border px-4 text-sm transition duration-150 ease-out select-none active:scale-97 has-focus-visible:ring-3 has-disabled:cursor-not-allowed has-disabled:opacity-50",
         className
       )}
     >
