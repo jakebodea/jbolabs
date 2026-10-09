@@ -18,8 +18,9 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         link: "text-primary underline-offset-4 hover:underline",
-        // Site addition: a light button for dark bands (the closing call to action).
-        inverse: "bg-background text-foreground hover:bg-background/90",
+        // Site addition: the panel's inverse, for buttons on `bg-panel` (the closing call to action).
+        // Panel tokens, not page ones: in dark mode the page background is darker than the panel.
+        inverse: "bg-panel-foreground text-panel hover:bg-panel-foreground/90",
       },
       size: {
         default:
