@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 import { distilledCloudflare } from "@alchemy.run/frontend-frameworks/astro/cloudflare";
 import react from "@astrojs/react";
-import { workerEntryAlias } from "@jakebodea/cloudflare-kit/emdash/alchemy-workarounds";
+import { workerEntryAlias } from "@jakebodea/cloudflare-kit/astro/worker-entry";
 import {
   WORKER_COMPATIBILITY,
   readBuildInputs,

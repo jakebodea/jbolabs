@@ -1,5 +1,5 @@
 {
-  "name": "@sites/jbolabs",
+  "name": "@jbolabs/site",
   "private": true,
   "description": "JBO Labs studio site: Astro on Cloudflare Workers, deployed with Alchemy. Content lives in code (src/content).",
   "type": "module",

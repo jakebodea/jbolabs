@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+  push:
+    branches: [main]
+  # Re-runs the prod deploy (a re-run of an old push deploys that old commit).
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # The `main` ruleset (stacks/github.ts) requires this context.
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: check-${{ github.event.pull_request.number || github.sha }}-${{ github.event.action == 'labeled' && github.event.label.name != 'preview' && 'labels' || 'code' }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - name: Lint
+        run: bun run lint:ci
+      - name: Typecheck and test
+        run: bunx turbo run typecheck test //#typecheck:root //#test:root
+      - name: Build (no Cloudflare credentials)
+        run: bun run build
+
+  preview:
+    needs: check
+    # Fork PRs never get deploy credentials; deploys skip until stacks/github.ts has run.
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && contains(github.event.pull_request.labels.*.name, 'preview') && (github.event.action != 'labeled' || github.event.label.name == 'preview') && vars.DEPLOYS_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: preview
+    concurrency:
+      group: preview-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+      STAGE: pr-${{ github.event.pull_request.number }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - name: Deploy preview
+        working-directory: apps/jbolabs
+        run: bunx alchemy deploy --stage "$STAGE" --yes --no-input
+      - name: Smoke and SEO checks
+        run: |
+          origin="$(bun scripts/ci/origin.ts "$STAGE")"
+          echo "::notice::Preview: $origin"
+          bun run app -- smoke --site jbolabs --url "$origin"
+          bun run app -- seo --site jbolabs --url "$origin"
+
+  production:
+    needs: check
+    if: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && vars.DEPLOYS_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+    concurrency:
+      group: production
+      cancel-in-progress: false
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+      CF_ANALYTICS_API_TOKEN: ${{ secrets.CF_ANALYTICS_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - name: Deploy jbolabs.com
+        working-directory: apps/jbolabs
+        run: bunx alchemy deploy --stage prod --yes --no-input
+      - name: Smoke and SEO checks
+        run: |
+          origin="$(bun scripts/ci/origin.ts prod)"
+          bun run app -- smoke --site jbolabs --url "$origin"
+          bun run app -- seo --site jbolabs --url "$origin"

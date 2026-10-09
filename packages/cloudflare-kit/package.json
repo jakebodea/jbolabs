@@ -1,0 +1,41 @@
+{
+  "name": "@jakebodea/cloudflare-kit",
+  "private": true,
+  "description": "Shared code for the jbolabs site: Effect server services, analytics, and Alchemy helpers.",
+  "type": "module",
+  "exports": {
+    "./server": "./src/server/index.ts",
+    "./infra": "./src/infra/index.ts",
+    "./infra/stage": "./src/infra/stage.ts",
+    "./seo": "./src/seo.ts",
+    "./env": "./src/env.ts",
+    "./astro/web-analytics-beacon.astro": "./src/astro/web-analytics-beacon.astro",
+    "./astro/worker-entry": "./src/astro/worker-entry.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "effect": "catalog:"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "catalog:",
+    "@effect/vitest": "catalog:",
+    "@jakebodea/config": "workspace:*",
+    "@types/bun": "catalog:",
+    "alchemy": "catalog:",
+    "astro": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "alchemy": "catalog:",
+    "astro": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "alchemy": {
+      "optional": true
+    }
+  }
+}

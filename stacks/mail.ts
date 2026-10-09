@@ -26,9 +26,9 @@ const dist = (path: string) =>
 
 /** Queue consumer settings copied from Mailflare's `wrangler.jsonc`. */
 const queues = [
-  { binding: "INBOUND_QUEUE", id: "Inbound", batchSize: 5 },
-  { binding: "OUTBOUND_QUEUE", id: "Outbound", batchSize: 5 },
-  { binding: "AGENT_QUEUE", id: "Agent", batchSize: 1 },
+  { batchSize: 5, binding: "INBOUND_QUEUE", id: "Inbound" },
+  { batchSize: 5, binding: "OUTBOUND_QUEUE", id: "Outbound" },
+  { batchSize: 1, binding: "AGENT_QUEUE", id: "Agent" },
 ] as const;
 
 export default Alchemy.Stack(
@@ -72,12 +72,12 @@ export default Alchemy.Stack(
         zoneId: domain.zoneId,
       }).pipe(RemovalPolicy.retain());
       yield* Cloudflare.DNS.Record(`Dmarc-${id}`, {
-        zoneId: domain.zoneId,
-        name: `_dmarc.${domain.name}`,
-        type: "TXT",
         // Monitor first; tighten to quarantine once reports show only Cloudflare sending.
         content: '"v=DMARC1; p=none; adkim=r; aspf=r"',
+        name: `_dmarc.${domain.name}`,
         ttl: 1,
+        type: "TXT",
+        zoneId: domain.zoneId,
       });
       zones.push({ ...domain, id });
     }
@@ -86,7 +86,10 @@ export default Alchemy.Stack(
     // repairs routing, DNS and sending on these zones (the same settings this
     // stack declares, so its writes are no-ops). Scoped to just these zones.
     const zoneScope = Object.fromEntries(
-      zones.map((zone) => [`com.cloudflare.api.account.zone.${zone.zoneId}`, "*"])
+      zones.map((zone) => [
+        `com.cloudflare.api.account.zone.${zone.zoneId}`,
+        "*",
+      ])
     );
     const cfToken = yield* Cloudflare.ApiToken.AccountApiToken("RuntimeToken", {
       accountId,
@@ -111,38 +114,42 @@ export default Alchemy.Stack(
     });
 
     const worker = yield* Cloudflare.Worker("Mailflare", {
-      name: mailflare.workerName,
-      main: dist("server/index.js"),
-      bundle: false,
       assets: { directory: dist("client"), notFoundHandling: "none" },
+      bundle: false,
       compatibility: {
         date: "2026-05-20",
         flags: ["nodejs_compat", "global_fetch_strictly_public"],
       },
       crons: ["0 2 * * *", "*/5 * * * *"],
       domain: mailflare.host,
-      observability: { enabled: true },
       env: {
-        DB: db,
-        BUCKET: bucket,
-        ...Object.fromEntries(queueResources.map((q) => [q.binding, q.resource])),
-        REALTIME: Cloudflare.DurableObject("REALTIME", { className: "RealtimeHub" }),
-        AI: Cloudflare.Workers.AI("AI"),
-        IMAGES: Cloudflare.Images.Images("IMAGES"),
-        EMAIL: Cloudflare.Email.SendEmail("EMAIL"),
-        WORKER_SELF_REFERENCE: Cloudflare.Workers.Self,
-        LOGIN_RATE_LIMIT: Cloudflare.RateLimit("LOGIN_RATE_LIMIT", {
-          namespaceId: 1001,
-          simple: { limit: 20, period: 60 },
-        }),
+        ...Object.fromEntries(
+          queueResources.map((q) => [q.binding, q.resource])
+        ),
         AGENT_RATE_LIMIT: Cloudflare.RateLimit("AGENT_RATE_LIMIT", {
           namespaceId: 1002,
           simple: { limit: 120, period: 60 },
         }),
+        AI: Cloudflare.Workers.AI("AI"),
         APP_URL: `https://${mailflare.host}`,
+        BUCKET: bucket,
         CF_EMAIL_WORKER_NAME: mailflare.workerName,
         CF_TOKEN: cfToken.value,
+        DB: db,
+        EMAIL: Cloudflare.Email.SendEmail("EMAIL"),
+        IMAGES: Cloudflare.Images.Images("IMAGES"),
+        LOGIN_RATE_LIMIT: Cloudflare.RateLimit("LOGIN_RATE_LIMIT", {
+          namespaceId: 1001,
+          simple: { limit: 20, period: 60 },
+        }),
+        REALTIME: Cloudflare.DurableObject("REALTIME", {
+          className: "RealtimeHub",
+        }),
+        WORKER_SELF_REFERENCE: Cloudflare.Workers.Self,
       },
+      main: dist("server/index.js"),
+      name: mailflare.workerName,
+      observability: { enabled: true },
     });
 
     for (const queue of queueResources) {
@@ -155,9 +162,9 @@ export default Alchemy.Stack(
 
     for (const zone of zones) {
       yield* Cloudflare.Email.CatchAll(`CatchAll-${zone.id}`, {
-        zone: zone.zoneId,
-        name: `Route all email to ${mailflare.workerName}`,
         actions: [{ type: "worker", value: [worker.workerName] }],
+        name: `Route all email to ${mailflare.workerName}`,
+        zone: zone.zoneId,
       });
     }
 
