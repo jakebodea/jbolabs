@@ -58,7 +58,7 @@ export const hero: Hero = {
   },
   headline: "Great websites, *shipped fast.*",
   primary: startProject,
-  secondary: { href: "#process", label: "How I work" },
+  secondary: { href: "/work", label: "See my work" },
   subheadline:
     "Websites and web apps for small businesses that look sharp, load fast, and are easy to update.",
 };
@@ -79,23 +79,24 @@ export const pillars: Pillars = {
 };
 
 export const services: ListSection = {
-  headline: "The *work.*",
+  headline: "Your website, *done right.*",
+  intro: "Most projects start here.",
   items: [
     {
-      body: "Fast, findable, easy to update.",
+      body: "Fast, findable, and easy for you to update.",
       title: "Marketing websites",
     },
     {
-      body: "Portals, bookings, dashboards, internal tools.",
-      title: "Web apps and tools",
-    },
-    {
-      body: "Audits, second opinions, a plan before you hire.",
-      title: "Technical consulting",
+      body: "Portals, bookings, dashboards, internal tools. Whatever your business needs built.",
+      title: "Custom software",
     },
     {
       body: "Updates, monitoring, backups, and a real person to call.",
       title: "Care and hosting",
+    },
+    {
+      body: "AI tools and automations built around how you already work.",
+      title: "AI and automation",
     },
   ],
 };
@@ -104,7 +105,7 @@ export const process: ListSection = {
   headline: "How a project *runs.*",
   items: [
     {
-      body: "A short chat about your goals.",
+      body: "A short chat about your business and what you need.",
       title: "Intro call",
     },
     {
@@ -116,8 +117,8 @@ export const process: ListSection = {
       title: "Build",
     },
     {
-      body: "We go live, and I stay on hand.",
-      title: "Launch and care",
+      body: "We go live, I stay on hand, and we look at what to take off your plate next.",
+      title: "Launch and beyond",
     },
   ],
 };
@@ -128,7 +129,7 @@ export const faq: FaqSection = {
     {
       answer:
         "A fixed quote after the intro call, based on scope. Share a rough budget and I will suggest what fits.",
-      question: "What does a project cost?",
+      question: "What does a website cost?",
     },
     {
       answer:
@@ -137,8 +138,18 @@ export const faq: FaqSection = {
     },
     {
       answer:
-        "Yes. I work with clients anywhere, over video calls and a shared preview link.",
-      question: "Do you work remotely?",
+        "Yes. Text, photos, prices, and hours. Change them any time without emailing me.",
+      question: "Can I update the site myself?",
+    },
+    {
+      answer:
+        "Yes. If your business needs something built, from a customer portal to an AI tool, I can build it. Tell me what you have in mind and I will tell you straight whether it is worth doing.",
+      question: "Can you help with more than the website?",
+    },
+    {
+      answer:
+        "I am based in Irvine and work with businesses across Orange County, so we can meet in person. I also work with clients anywhere over video calls.",
+      question: "Are you local?",
     },
   ],
 };

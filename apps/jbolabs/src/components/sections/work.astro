@@ -1,0 +1,41 @@
+---
+/** Client sites on `/work`, each shown as a screenshot of its home page in a browser frame. */
+import { ArrowRight, ArrowUpRight } from "@lucide/astro";
+
+import type { WorkSection } from "@/content/types";
+
+interface Props {
+  value: WorkSection;
+}
+
+const { value } = Astro.props;
+---
+
+<section class="container-page pb-12 sm:pb-16">
+  <ul class="grid gap-12 md:grid-cols-2 md:gap-8">
+    {value.items.map((item) => (
+      <li>
+        <figure class="overflow-hidden rounded-2xl border border-border bg-card shadow-[0_1px_2px_oklch(0.2_0.02_265/0.04),0_24px_48px_-28px_oklch(0.2_0.02_265/0.24)]">
+          <div class="flex items-center gap-1.5 border-b border-border bg-muted/60 px-4 py-2.5" aria-hidden="true">
+            <span class="size-2 rounded-full bg-foreground/15"></span>
+            <span class="size-2 rounded-full bg-foreground/15"></span>
+            <span class="size-2 rounded-full bg-foreground/15"></span>
+          </div>
+          <img src={item.image} alt={`The ${item.name} home page`} width="1200" height="750" loading="lazy" decoding="async" class="aspect-[16/10] w-full object-cover object-top" />
+        </figure>
+        <p class="mt-6 font-mono text-xs tracking-wide text-muted-foreground uppercase">{item.kind}</p>
+        <h2 class="mt-2 text-xl font-medium tracking-[-0.015em]">{item.name}</h2>
+        <p class="mt-2 max-w-md leading-relaxed text-muted-foreground">{item.body}</p>
+        {item.href && (
+          <a href={item.href} class="mt-4 inline-flex items-center gap-1 font-medium underline-offset-4 hover:underline">Visit {new URL(item.href).hostname}<ArrowUpRight class="size-4" aria-hidden="true" /></a>
+        )}
+      </li>
+    ))}
+  </ul>
+  {value.aside && (
+    <p class="mt-16 border-t border-border pt-8 text-muted-foreground">
+      {value.aside.text}
+      <a href={value.aside.link.href} class="ml-1 inline-flex items-center gap-1 font-medium text-foreground underline-offset-4 hover:underline">{value.aside.link.label}<ArrowRight class="size-4" aria-hidden="true" /></a>
+    </p>
+  )}
+</section>
