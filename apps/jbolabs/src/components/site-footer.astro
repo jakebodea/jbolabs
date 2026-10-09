@@ -1,6 +1,7 @@
 ---
 import type { Link } from "@/content/types";
 import { site } from "../../site.config";
+import FooterSunset from "./footer-sunset.astro";
 import Wordmark from "./wordmark.astro";
 
 interface Props {
@@ -30,8 +31,9 @@ const year = new Date().getFullYear();
       </ul>
     </nav>
   </div>
-  <div class="container-page flex flex-col gap-1 pt-0 pb-[max(2.5rem,env(safe-area-inset-bottom))] text-xs text-muted-foreground sm:flex-row sm:justify-between">
+  <div class="container-page flex flex-col gap-1 pt-0 pb-6 text-xs text-muted-foreground sm:flex-row sm:justify-between">
     <p>&copy; {year} {title}</p>
     <p>Independent studio of {site.business.founder}</p>
   </div>
+  <FooterSunset />
 </footer>
