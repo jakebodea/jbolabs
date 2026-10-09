@@ -65,6 +65,35 @@ export interface ListSection {
   readonly items: readonly ListItem[];
 }
 
+/** A client site, shown with a screenshot of its home page. */
+export interface WorkItem {
+  readonly name: string;
+  /** What the business is and where, e.g. "Custom home builder, Irvine". */
+  readonly kind: string;
+  readonly body: string;
+  /** A 16:10 screenshot under `public/`. */
+  readonly image: string;
+  /** The live site, once it is on its own domain. */
+  readonly href?: string;
+}
+
+/** The `/work` page's list: client sites, then a quiet line pointing elsewhere. */
+export interface WorkSection {
+  readonly items: readonly WorkItem[];
+  readonly aside?: { readonly text: string; readonly link: Link };
+}
+
+/** One of my own products. */
+export interface Product {
+  readonly name: string;
+  readonly kind: string;
+  readonly description: string;
+  readonly status: "Live" | "Beta" | "Coming soon";
+  readonly href?: string;
+  /** A 16:10 screenshot of its landing page under `public/`. */
+  readonly image?: string;
+}
+
 export interface FaqSection {
   readonly headline: string;
   readonly items: readonly {

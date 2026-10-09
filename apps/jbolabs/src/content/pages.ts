@@ -1,44 +1,97 @@
 /** Copy for the smaller pages: titles, intros, and body text. */
-import type { CallToAction, Prose } from "./types.ts";
+import type { CallToAction, Link, Prose } from "./types.ts";
+
+const startProject: Link = { href: "/contact", label: "Start a project" };
 
 export const about = {
   closing: {
     headline: "Let's build something *good.*",
-    link: { href: "/contact", label: "Start a project" },
+    link: startProject,
   } satisfies CallToAction,
   description:
-    "Jake Bodea runs JBO Labs, a one-person studio building websites, web apps, and internal tools for small businesses and founders.",
+    "Jake Bodea runs JBO Labs from Irvine: websites, custom software, and AI tools for Orange County businesses.",
   intro:
-    "A small studio with a simple idea: do fewer projects, and do them very well.",
-  // Placeholder bio: Jake to replace with his own words.
+    "A one-person studio in Orange County. Websites, custom software, and AI tools, all built by me.",
+  // A draft in Jake's voice, from jakebodea.com: Jake to edit.
   prose: [
     {
       paragraph:
-        "Hi, I am Jake. I run JBO Labs, a one-person studio that builds websites and web software for small businesses, founders, and teams.",
+        "Hi, I'm Jake. I run JBO Labs from Irvine, building websites and software for local businesses. You work with me directly, from the first call to launch and long after.",
     },
     {
       paragraph:
-        "I care about the details most people never notice: pages that load instantly, forms that work on the first try, and sites that stay easy to change long after launch.",
+        "Before going independent I built software in-house: websites, internal tools, and AI systems running in production every day. If it can be built, I would rather figure it out than say no.",
     },
     {
       paragraph:
-        "I work with a small number of clients at a time, so every project gets my full attention.",
+        "I studied math, then AI at Stanford, where I now help teach two of its online machine learning courses. I keep up with this stuff so you do not have to.",
     },
     { heading: "How I like to work" },
     {
       paragraph:
         "Plain language, fixed prices, and no surprises. You always know what is being built, what it costs, and when it will be done.",
     },
+    {
+      paragraph:
+        "I take on a small number of clients at a time, so every project gets my full attention.",
+    },
+    { heading: "Outside of work" },
+    {
+      paragraph:
+        "I lead worship at my church, build my own products on the side, and go on as many adventures with my wife as she will put up with.",
+    },
   ] satisfies Prose,
   title: "About",
 };
 
+export const workPage = {
+  aside: {
+    link: { href: "/products", label: "See my products" },
+    text: "I also build and run software of my own.",
+  },
+  closing: {
+    headline: "Your business *could be next.*",
+    link: startProject,
+  } satisfies CallToAction,
+  description:
+    "Websites Jake Bodea has built at JBO Labs for Southern California businesses, including Access Electric and MS Custom Homes.",
+  intro: "Two Southern California businesses, two very different sites.",
+  items: [
+    {
+      body: "A portfolio-led site for a commercial contractor that has wired schools, offices, and warehouses since 2001. They add new projects themselves.",
+      href: "https://accesselectricinc.com",
+      image: "/work/access-electric.webp",
+      kind: "Electrical contractor, Southern California",
+      name: "Access Electric",
+    },
+    {
+      body: "A calm, photo-first site for a woman-owned builder, with a full portfolio and a financing page for homeowners planning a remodel.",
+      image: "/work/ms-custom-homes.webp",
+      kind: "Custom home builder, Irvine",
+      name: "MS Custom Homes",
+    },
+  ],
+  title: "Work",
+};
+
+export const productsPage = {
+  closing: {
+    headline: "Need something *built?*",
+    link: startProject,
+  } satisfies CallToAction,
+  description:
+    "Products made by Jake Bodea at JBO Labs: PCOBooster for worship teams, Shouldertap for Mac, and Super Simple Secret Santa.",
+  intro:
+    "Between client projects I build my own products. They get the same care as client work, and they keep my skills sharp.",
+  title: "Products",
+};
+
 export const contact = {
   description:
-    "Tell Jake about your website, web app, or consulting project. A few details up front make the first conversation far more useful.",
+    "Tell Jake about the website, software, or AI tool you need. A few details up front make the first conversation far more useful.",
   headline: "Let's build *something good.*",
   intro:
-    "Tell me about what you are building. A few details now make our first conversation far more useful.",
+    "Tell me about your business and what you need. A few details now make our first conversation far more useful.",
   nextSteps: [
     "I read your note and reply within two business days.",
     "We have a short intro call to talk it through.",

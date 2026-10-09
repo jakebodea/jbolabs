@@ -1,0 +1,14 @@
+---
+import PageHeader from "@/components/page-header.astro";
+import CtaBand from "@/components/sections/cta-band.astro";
+import Products from "@/components/sections/products.astro";
+import { productsPage } from "@/content/pages";
+import { products } from "@/content/products";
+import Base from "@/layouts/base.astro";
+---
+
+<Base title={productsPage.title} description={productsPage.description}>
+  <PageHeader title={productsPage.title} intro={productsPage.intro} />
+  <Products items={products} />
+  <CtaBand value={productsPage.closing} />
+</Base>

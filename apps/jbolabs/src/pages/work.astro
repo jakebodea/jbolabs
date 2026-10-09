@@ -1,0 +1,13 @@
+---
+import PageHeader from "@/components/page-header.astro";
+import CtaBand from "@/components/sections/cta-band.astro";
+import Work from "@/components/sections/work.astro";
+import { workPage } from "@/content/pages";
+import Base from "@/layouts/base.astro";
+---
+
+<Base title={workPage.title} description={workPage.description}>
+  <PageHeader title={workPage.title} intro={workPage.intro} />
+  <Work value={workPage} />
+  <CtaBand value={workPage.closing} />
+</Base>

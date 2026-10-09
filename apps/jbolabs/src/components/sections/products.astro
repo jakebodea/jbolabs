@@ -1,0 +1,36 @@
+---
+/** My own products on `/products`: one row each, with a screenshot when there is one. */
+import { ArrowUpRight } from "@lucide/astro";
+
+import type { Product } from "@/content/types";
+
+interface Props {
+  items: readonly Product[];
+}
+
+const { items } = Astro.props;
+---
+
+<section class="container-page pb-12 sm:pb-16">
+  <ul class="border-t border-border">
+    {items.map((product, index) => (
+      // Screenshots alternate sides on wide screens: right, left, right, ...
+      <li class:list={["grid gap-8 border-b border-border py-12", product.image && "md:items-center md:gap-16", product.image && (index % 2 === 0 ? "md:grid-cols-[1fr_1.1fr]" : "md:grid-cols-[1.1fr_1fr]")]}>
+        <div class:list={[product.image && index % 2 === 1 && "md:order-last"]}>
+          <h2 class="text-2xl font-medium tracking-[-0.015em]">{product.name}</h2>
+          <p class="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs tracking-wide text-muted-foreground uppercase">
+            <span>{product.kind}</span>
+            <span class:list={["rounded-full px-2 py-0.5", product.status === "Coming soon" ? "border border-border" : "bg-signal-soft text-foreground"]}>{product.status}</span>
+          </p>
+          <p class="mt-6 max-w-xl leading-relaxed text-muted-foreground">{product.description}</p>
+          {product.href && (
+            <a href={product.href} class="mt-6 inline-flex items-center gap-1 font-medium underline-offset-4 hover:underline">Visit {product.name}<ArrowUpRight class="size-4" aria-hidden="true" /></a>
+          )}
+        </div>
+        {product.image && (
+          <img src={product.image} alt={`The ${product.name} landing page`} width="1200" height="750" loading="lazy" decoding="async" class="aspect-[16/10] w-full rounded-2xl border border-border object-cover object-top" />
+        )}
+      </li>
+    ))}
+  </ul>
+</section>

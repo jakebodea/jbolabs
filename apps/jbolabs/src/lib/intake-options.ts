@@ -7,7 +7,7 @@ export const SERVICES = [
   "New website",
   "Website redesign",
   "Web app or tool",
-  "Technical consulting",
+  "Custom software or AI",
   "Ongoing care",
   "Not sure yet",
 ] as const;
