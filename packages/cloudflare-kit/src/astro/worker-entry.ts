@@ -4,7 +4,7 @@
  * Alchemy's `Cloudflare.Website.Astro` injects its own Cloudflare adapter and
  * pins the Worker entry. This Vite alias swaps in the site's own entry so it
  * can add cron handlers and response headers. Verified with Alchemy and its
- * frontend-frameworks package at 2.0.0-beta.80; delete it when Alchemy
+ * frontend-frameworks package at 2.0.0-beta.82; delete it when Alchemy
  * supports a custom Worker entry for Astro.
  */
 
