@@ -159,3 +159,13 @@ export const swellY = (
     Math.sin(x * 0.006 + time * 0.6 + line * 0.5) * amplitude * 0.35
   );
 };
+
+/**
+ * How far either side of the sun swell line `line` reaches before it has faded
+ * out: as wide as the sky glow at the horizon, bellying out a little mid-water
+ * and drawing in toward the viewer, so the sea frames the sun rather than the page.
+ */
+export const swellReach = (scene: Scene, line: number): number => {
+  const depth = (line / (SWELL_LINES - 1)) ** 1.9;
+  return scene.radius * (2.75 + 0.9 * depth - 1.15 * depth ** 2);
+};

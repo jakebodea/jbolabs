@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { ditherDensity, isInked, sceneFor, swellY } from "./sunset.ts";
+import {
+  SWELL_LINES,
+  ditherDensity,
+  isInked,
+  sceneFor,
+  swellReach,
+  swellY,
+} from "./sunset.ts";
 
 const cells = Array.from(
   { length: 16 },
@@ -49,5 +56,13 @@ describe(swellY, () => {
     expect(
       [0, 400, 1279].map((x) => swellY(sceneFor(1280, 300), x, 0, 12.5))
     ).toStrictEqual([126, 126, 126]);
+  });
+});
+
+describe(swellReach, () => {
+  it("frames the sun on a wide screen instead of running to the edges", () => {
+    // Sun radius 114: the glow's last dots at the horizon sit about 313 px out.
+    expect(swellReach(sceneFor(1280, 300), 0)).toBeCloseTo(313.5);
+    expect(swellReach(sceneFor(1280, 300), SWELL_LINES - 1)).toBeCloseTo(285);
   });
 });

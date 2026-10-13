@@ -4,6 +4,7 @@ import {
   ditherDensity,
   isInked,
   sceneFor,
+  swellReach,
   swellY,
 } from "@/lib/sunset";
 import type { Scene } from "@/lib/sunset";
@@ -57,11 +58,18 @@ const paintDither = (
   layer.putImageData(image, 0, 0);
 };
 
+/** Gradient stops across a swell line: smoothstep from clear at each end to solid in the middle. */
+const FADE_STOPS = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1].map(
+  (stop) => {
+    const edge = Math.min(1, Math.min(stop, 1 - stop) / 0.4);
+    return [stop, Number((edge * edge * (3 - 2 * edge)).toFixed(3))] as const;
+  }
+);
+
 const paintSwell = (
   context: CanvasRenderingContext2D,
   scene: Scene,
-  signal: string,
-  clear: string,
+  rgb: readonly [number, number, number],
   time: number
 ) => {
   for (let line = 0; line < SWELL_LINES; line += 1) {
@@ -70,17 +78,23 @@ const paintSwell = (
     for (let x = 0; x <= scene.width + 6; x += 6) {
       context.lineTo(x, swellY(scene, x, line, time));
     }
+    // Each line fades out on both sides, eased so the sea dissolves rather than stops.
+    const reach = swellReach(scene, line);
+    const fadeOut = context.createLinearGradient(
+      scene.centerX - reach,
+      0,
+      scene.centerX + reach,
+      0
+    );
+    for (const [stop, alpha] of FADE_STOPS) {
+      fadeOut.addColorStop(stop, `rgb(${rgb.join(" ")} / ${alpha})`);
+    }
+    context.strokeStyle = fadeOut;
     if (line === 0) {
-      // The horizon: a faint hairline that fades out toward both edges.
-      const fadeOut = context.createLinearGradient(0, 0, scene.width, 0);
-      fadeOut.addColorStop(0, clear);
-      fadeOut.addColorStop(0.5, signal);
-      fadeOut.addColorStop(1, clear);
-      context.strokeStyle = fadeOut;
+      // The horizon: a faint hairline.
       context.globalAlpha = 0.45;
       context.lineWidth = 0.6;
     } else {
-      context.strokeStyle = signal;
       context.globalAlpha = 0.12 + depth * 0.75;
       context.lineWidth = 0.6 + depth * 0.9;
     }
@@ -129,7 +143,7 @@ const mount = (canvas: HTMLCanvasElement) => {
       layerCanvas.width * DITHER_PX,
       layerCanvas.height * DITHER_PX
     );
-    paintSwell(context, scene, signal, `rgb(${rgb.join(" ")} / 0)`, time);
+    paintSwell(context, scene, rgb, time);
   };
 
   const tick = (now: number) => {
