@@ -68,7 +68,7 @@ export interface ListSection {
 /** A client site, shown with a screenshot of its home page. */
 export interface WorkItem {
   readonly name: string;
-  /** What the business is and where, e.g. "Custom home builder, Irvine". */
+  /** What the business is, e.g. "Custom home builder". */
   readonly kind: string;
   readonly body: string;
   /** A 16:10 screenshot under `public/`. */

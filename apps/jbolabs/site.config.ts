@@ -23,10 +23,10 @@ export const site = {
   business,
 
   description:
-    "JBO Labs is the Orange County web studio of Jake Bodea: websites and web apps for local businesses, plus help with the tech behind them.",
+    "JBO Labs is the web studio of Jake Bodea: websites and web apps for small businesses, plus help with the tech behind them.",
   /** Appended to meta descriptions too short for a search snippet (see `metaDescription`). */
   descriptionContext:
-    "Websites and web apps for Orange County businesses, by Jake Bodea at JBO Labs.",
+    "Websites and web apps for small businesses, by Jake Bodea at JBO Labs.",
 
   /** Attached to the production Worker through Alchemy. */
   domain: "jbolabs.com",
@@ -41,9 +41,9 @@ export const site = {
   shortName: "JBO Labs",
 
   /** Footer line under the wordmark. */
-  tagline: "Websites and web apps for Orange County businesses.",
+  tagline: "Websites and web apps for small businesses.",
   /** Home page `<title>`: "JBO Labs | <this>". */
-  titleSuffix: "Websites for Orange County businesses",
+  titleSuffix: "Websites for small businesses",
 
   /** The Cloudflare account's workers.dev subdomain (non-prod stages live there). */
   workersSubdomain: "jakebodea",
