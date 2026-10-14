@@ -148,8 +148,8 @@ export const faq: FaqSection = {
     },
     {
       answer:
-        "I am based in Irvine and work with businesses across Orange County, so we can meet in person. I also work with clients anywhere over video calls.",
-      question: "Are you local?",
+        "Yes. We can work together entirely over video calls, wherever your business is.",
+      question: "Do you work with clients remotely?",
     },
   ],
 };

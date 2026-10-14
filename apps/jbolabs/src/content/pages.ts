@@ -54,20 +54,20 @@ export const workPage = {
     link: startProject,
   } satisfies CallToAction,
   description:
-    "Websites Jake Bodea has built at JBO Labs for Southern California businesses, including Access Electric and MS Custom Homes.",
-  intro: "Two Southern California businesses, two very different sites.",
+    "Websites Jake Bodea has built at JBO Labs for small businesses, including Access Electric and MS Custom Homes.",
+  intro: "Two businesses, two very different sites.",
   items: [
     {
       body: "A portfolio-led site for a commercial contractor that has wired schools, offices, and warehouses since 2001. They add new projects themselves.",
       href: "https://accesselectricinc.com",
       image: "/work/access-electric.webp",
-      kind: "Electrical contractor, Southern California",
+      kind: "Electrical contractor",
       name: "Access Electric",
     },
     {
       body: "A calm, photo-first site for a woman-owned builder, with a full portfolio and a financing page for homeowners planning a remodel.",
       image: "/work/ms-custom-homes.webp",
-      kind: "Custom home builder, Irvine",
+      kind: "Custom home builder",
       name: "MS Custom Homes",
     },
   ],
