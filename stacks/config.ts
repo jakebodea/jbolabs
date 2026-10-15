@@ -8,7 +8,7 @@ export const accountId = "984b82870acd18daf8bda97bad966b38";
 
 /** This repository on GitHub; `stacks/github.ts` writes CI credentials into it. */
 export const repository = {
-  owner: "jakebodea",
+  owner: "jbolabs",
   repository: "jbolabs",
 } as const;
 
