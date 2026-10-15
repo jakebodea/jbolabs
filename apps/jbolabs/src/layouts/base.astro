@@ -31,6 +31,8 @@ const fullTitle = title === undefined ? `${site.name} | ${site.titleSuffix}` : d
 const pageDescription = metaDescription(description ?? site.description, site.descriptionContext);
 const canonical = `${origin}${Astro.url.pathname === "/" ? "/" : Astro.url.pathname.replace(/\/$/u, "")}`;
 const ogImage = `${origin}/og-default.png?v=20261006`;
+// `--background` in global.css as hex, for browser chrome that can't read CSS.
+const themeColor = { dark: "#2c2e31", light: "#ffffff" };
 
 ---
 
@@ -39,14 +41,27 @@ const ogImage = `${origin}/og-default.png?v=20261006`;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#33353a" media="(prefers-color-scheme: dark)" />
-    <!-- Pick light or dark before first paint: a saved choice wins, else the system setting. -->
-    <script is:inline>
+    <meta name="theme-color" content={themeColor.light} media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content={themeColor.dark} media="(prefers-color-scheme: dark)" />
+    <!--
+      Pick light or dark before first paint: a saved choice wins, else the system
+      setting. Both theme-color tags then follow the `.dark` class, so a saved
+      choice that differs from the system still colors the browser chrome.
+    -->
+    <script is:inline define:vars={{ themeColor }}>
       (() => {
+        const root = document.documentElement;
         const saved = localStorage.getItem("theme");
         const dark = saved ? saved === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
-        document.documentElement.classList.toggle("dark", dark);
+        root.classList.toggle("dark", dark);
+        const syncThemeColor = () => {
+          const color = root.classList.contains("dark") ? themeColor.dark : themeColor.light;
+          for (const meta of document.querySelectorAll('meta[name="theme-color"]')) {
+            meta.content = color;
+          }
+        };
+        syncThemeColor();
+        new MutationObserver(syncThemeColor).observe(root, { attributeFilter: ["class"] });
       })();
     </script>
     <title>{fullTitle}</title>
@@ -77,6 +92,9 @@ const ogImage = `${origin}/og-default.png?v=20261006`;
     <StructuredData origin={origin} />
   </head>
   <body class="flex min-h-svh flex-col">
+    <!-- Edge strips that iOS Safari samples to tint its status bar and toolbar (global.css). -->
+    <div class="safari-edge safari-edge-top" aria-hidden="true"></div>
+    <div class="safari-edge safari-edge-bottom" aria-hidden="true"></div>
     <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-full focus:bg-background focus:px-4 focus:py-2 focus:shadow">Skip to content</a>
     <SiteHeader title={site.name} items={primaryNav} />
     <main id="main" class="flex-1">
