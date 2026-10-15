@@ -109,6 +109,8 @@
   }
 
   html {
+    /* Overscroll and Safari's chrome extend this, so it matches the page. */
+    background-color: var(--background);
     -webkit-text-size-adjust: 100%;
     scroll-padding-top: 6rem;
 
@@ -191,6 +193,44 @@
   @media (prefers-reduced-motion: reduce) {
     transition: none;
     translate: 0 0;
+  }
+}
+
+/*
+ * iOS Safari tints its status bar and toolbar from fixed elements at the
+ * viewport edges, else from whatever scrolls under them (the dark call to
+ * action, the blue sunset). These strips (base.astro) pin both to the page
+ * background. Safari needs about 5px showing, so each 12px strip hangs 7px
+ * off-screen, behind the chrome and clear of content. Safari fills the toolbar
+ * area solid, so a short fade above it softens where content meets it (the
+ * sticky header already covers the top edge). Under the header, above the
+ * mobile menu. `-webkit-touch-callout` scopes it to iOS.
+ */
+@supports (-webkit-touch-callout: none) {
+  .safari-edge {
+    position: fixed;
+    inset-inline: 0;
+    z-index: 35;
+    height: 12px;
+    background-color: var(--background);
+    pointer-events: none;
+  }
+
+  .safari-edge-top {
+    top: -7px;
+  }
+
+  .safari-edge-bottom {
+    bottom: -7px;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      bottom: 100%;
+      height: 48px;
+      background: linear-gradient(to top, var(--background), transparent);
+    }
   }
 }
 
