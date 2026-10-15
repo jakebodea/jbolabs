@@ -24,9 +24,42 @@ const { value } = Astro.props;
               <span class="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-current transition-transform duration-200 group-open:rotate-90"></span>
             </span>
           </summary>
-          <p class="-mt-2 max-w-xl pb-6 leading-relaxed text-muted-foreground">{item.answer}</p>
+          <p class="max-w-xl pb-6 leading-relaxed text-muted-foreground">{item.answer}</p>
         </details>
       ))}
     </div>
   </div>
 </section>
+
+<style>
+  /*
+   * The answer opens and closes with the plus icon instead of snapping. Browsers
+   * without `::details-content` keep the instant toggle. The negative margin
+   * tucks the answer under the question (it lives here, not on the <p>, so the
+   * clipped box does not cut the text).
+   */
+  details::details-content {
+    height: 0;
+    opacity: 0;
+    overflow: clip;
+    transition:
+      height 250ms var(--ease-out-expo),
+      margin 250ms var(--ease-out-expo),
+      opacity 200ms ease-out,
+      content-visibility 250ms allow-discrete;
+  }
+
+  details[open]::details-content {
+    height: auto;
+    margin-top: -0.5rem;
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    details::details-content {
+      transition:
+        opacity 150ms ease-out,
+        content-visibility 150ms allow-discrete;
+    }
+  }
+</style>

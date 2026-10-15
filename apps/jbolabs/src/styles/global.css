@@ -70,6 +70,8 @@
   --font-mono: var(--font-label), ui-monospace, monospace;
 
   --ease-out-expo: cubic-bezier(0.23, 1, 0.32, 1);
+  /* A small settle past the target, kept for rare celebratory moments (the contact form's success check). */
+  --ease-overshoot: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
@@ -111,6 +113,8 @@
   html {
     -webkit-text-size-adjust: 100%;
     scroll-padding-top: 6rem;
+    /* Lets the FAQ answers transition to `height: auto`. */
+    interpolate-size: allow-keywords;
 
     @media (prefers-reduced-motion: no-preference) {
       scroll-behavior: smooth;
@@ -194,6 +198,84 @@
   }
 }
 
+/*
+ * Contact form motion. `auto-height` (islands/auto-height.tsx) glides the card
+ * to its content's height; the clip margin keeps focus rings visible.
+ */
+@utility auto-height {
+  height: var(--auto-height, auto);
+  overflow: clip;
+  overflow-clip-margin: 1rem;
+  transition: height 360ms var(--ease-out-expo);
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+/*
+ * A field's error message opens and closes in place: a one-row grid going
+ * from `0fr` to `1fr` animates to the content's height. Closed, the negative
+ * margin cancels the field's `gap-2`, so the field is exactly as tall as it
+ * was without a message.
+ */
+@utility field-reveal {
+  display: grid;
+  grid-template-rows: 0fr;
+  margin-top: calc(var(--spacing) * -2);
+  opacity: 0;
+  transition:
+    grid-template-rows 280ms var(--ease-out-expo),
+    margin 280ms var(--ease-out-expo),
+    opacity 180ms ease-out;
+
+  & > * {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  &[data-open="true"] {
+    grid-template-rows: 1fr;
+    margin-top: 0;
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: opacity 150ms ease-out;
+  }
+}
+
+/*
+ * The Back button grows in beside Next instead of squeezing it in one frame
+ * (the same grid technique, sideways). Closed, the negative margin cancels
+ * the row's `gap-3`.
+ */
+@utility inline-reveal {
+  display: grid;
+  grid-template-columns: 0fr;
+  margin-right: calc(var(--spacing) * -3);
+  opacity: 0;
+  transition:
+    grid-template-columns 380ms var(--ease-out-expo),
+    margin 380ms var(--ease-out-expo),
+    opacity 220ms ease-out;
+
+  & > * {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  &[data-open="true"] {
+    grid-template-columns: 1fr;
+    margin-right: 0;
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: opacity 150ms ease-out;
+  }
+}
+
 /* The sticky header turns transparent while the mobile menu is open, so the blur covers it too. */
 html[data-nav-open] header {
   background-color: transparent;
@@ -251,5 +333,12 @@ html[data-nav-open] header {
 @media (prefers-reduced-motion: reduce) {
   .rise {
     animation: none;
+  }
+
+  /* tw-animate-css entrances (contact form steps, success, errors) keep their fade but stop moving. */
+  .animate-in {
+    --tw-enter-translate-x: 0;
+    --tw-enter-translate-y: 0;
+    --tw-enter-scale: 1;
   }
 }
