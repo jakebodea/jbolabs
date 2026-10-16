@@ -151,7 +151,7 @@ export default Alchemy.Stack(
       },
       main: dist("server/index.js"),
       name: mailflare.workerName,
-      observability: { enabled: true },
+      observability: { enabled: true, issues: { enabled: true } },
     });
 
     for (const queue of queueResources) {

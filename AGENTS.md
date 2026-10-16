@@ -30,10 +30,12 @@ bun run app -- screenshot / /contact      # full-page PNGs at 1280 and 375
 bun run ci                  # lint (zero warnings) + typecheck + tests
 bun run build               # credential-free production build of the site
 bun run fix                 # format + autofix
-ALCHEMY_PROFILE=admin bun run plan:studio | plan:mail | plan:github   # read-only diffs
+ALCHEMY_PROFILE=admin bun run plan:studio | plan:mail | plan:github   # needs explicit go-ahead: state bootstrap can write
 ```
 
 The Alchemy profile comes from `ALCHEMY_PROFILE` (e.g. `ALCHEMY_PROFILE=admin`). See the `deploy` and `control-app` skills in `.agents/skills/`.
+
+Alchemy beta.82 deploys Durable Objects with declarative exports, a one-way change. Before the first deployment, coordinate every developer/CI deploy and cleanup path (including other repositories sharing `Cloudflare.state()`) on beta.82 or newer. The first DO deployment must use 100% traffic; never roll back its deploy tooling below beta.82. Use Bun or Node >=24.11.1. See `docs/alchemy-beta-82.md` for Mailflare coverage and rollout requirements.
 
 ## Never
 
@@ -55,7 +57,7 @@ Test behavior, not implementation. Assert a literal expected value from an indep
 ## Definition of done
 
 1. `bun run ci` passes (zero lint warnings).
-2. Verify on the running site (`bun run app -- start`, then `smoke`, `seo`, `screenshot` at both widths for visible changes). For stacks, a clean `plan`.
+2. Verify on the running site (`bun run app -- start`, then `smoke`, `seo`, `screenshot` at both widths for visible changes). For stacks, typecheck and local proofs; run a cloud-backed `plan` only with explicit go-ahead because `Cloudflare.state()` bootstrap can write.
 3. Report what you verified and anything you could not.
 
 <!-- BEGIN:turborepo-agent-rules -->

@@ -7,6 +7,8 @@ description: Deploy, preview, tear down, or rotate credentials for anything in t
 
 Always get Jake's go-ahead before deploying or destroying anything.
 
+Cloud-backed `plan` also needs explicit go-ahead: `Cloudflare.state()` can bootstrap or upgrade the shared state Worker/DO while loading state. Do not treat it as read-only. Before any beta.82 rollout, read `docs/alchemy-beta-82.md`: DO exports are one-way, all developer/CI deploy and cleanup paths sharing the state store must upgrade together, and the first deployment must use 100% traffic.
+
 **Alchemy is the only way infrastructure changes.** Resources, their settings, and their data change only through a stack (`apps/jbolabs/alchemy.run.ts`, `stacks/`) and `alchemy deploy`/`destroy`. Never use the dashboard, Cloudflare MCP write tools, `wrangler`, or raw API calls to create, edit, or delete anything, including rows in a stage's D1. Reading (listing resources, `SELECT` queries, logs) is fine. If something needs to change, change the stack and redeploy.
 
 ## The site
@@ -20,7 +22,7 @@ Always get Jake's go-ahead before deploying or destroying anything.
 
 ```bash
 cd apps/jbolabs
-ALCHEMY_PROFILE=admin bun alchemy plan --stage <stage>      # read-only diff first
+ALCHEMY_PROFILE=admin bun alchemy plan --stage <stage>      # with go-ahead: bootstrap can write
 ALCHEMY_PROFILE=admin bun alchemy deploy --stage <stage>
 ALCHEMY_PROFILE=admin bun alchemy destroy --stage <stage>   # non-prod buckets are force-emptied
 bun run app -- smoke --url "$(bun ../../scripts/ci/origin.ts <stage>)"

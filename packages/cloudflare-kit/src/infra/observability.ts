@@ -4,6 +4,7 @@ import type { StageSettings } from "./stage.ts";
 /** Logs on everywhere; traces sampled on prod. */
 export const siteObservability = (settings: StageSettings) => ({
   enabled: true,
+  issues: { enabled: true },
   logs: {
     enabled: true,
     headSamplingRate: 1,
