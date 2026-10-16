@@ -48,6 +48,8 @@
   "scripts": {
     "build": "turbo run build",
     "check": "bun run sync && ultracite check --max-warnings 0",
+    "check:copy": "bun packages/config/check-copy.ts",
+    "check:locality": "bun packages/config/check-locality.ts",
     "fix": "bun run sync && ultracite fix",
     "lint:ci": "bun run sync && ultracite check --max-warnings 0 --format github",
     "typecheck": "turbo run typecheck //#typecheck:root",
