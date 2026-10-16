@@ -35,6 +35,14 @@ export const studio = {
   sendingSubdomain: "mail.jbolabs.com",
 } as const;
 
+/** One zone onboarded to Mailflare; flags are required so deploys never assume uniform DNS. */
+export interface MailDomain {
+  readonly name: string;
+  readonly ownsDmarc: boolean;
+  readonly ownsRouting: boolean;
+  readonly zoneId: string;
+}
+
 export const mailflare = {
   /** Where the web UI is served. Not `mail.`: that is the sites' sending subdomain. */
   host: "inbox.jbolabs.com",
@@ -82,4 +90,4 @@ export const mailDomains = [
     ownsRouting: true,
     zoneId: "67ca54dc8d4b36bf46486ad14875914d",
   },
-] as const;
+] as const satisfies readonly MailDomain[];
