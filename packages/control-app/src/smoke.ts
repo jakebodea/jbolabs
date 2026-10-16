@@ -5,6 +5,8 @@ import { request } from "./http.ts";
  * local dev also the contact action (Turnstile test keys) and the cron
  * handler. Returns structured checks so agents can attach them to proof.
  */
+import { panelCtaReadableInDarkMode } from "./panel-cta-dark.ts";
+import { panelCtaUsesPanelTokens } from "./panel-cta.ts";
 import { discoverPaths } from "./sitemap.ts";
 
 export interface SmokeCheck {
@@ -148,6 +150,27 @@ const contactCheck = async (origin: string): Promise<SmokeCheck> => {
   );
 };
 
+const panelCtaTokenCheck = async (origin: string): Promise<SmokeCheck> => {
+  const response = await request(`${origin}/`);
+  const html = await response.text();
+  const ok = response.ok && panelCtaUsesPanelTokens(html);
+  return check(
+    "panel CTA tokens",
+    ok,
+    ok
+      ? "closing CTA uses panel button tokens"
+      : "closing CTA on bg-panel must use bg-panel-foreground, not bg-background"
+  );
+};
+
+const panelCtaDarkCheck = async (origin: string): Promise<SmokeCheck> => {
+  const result = await panelCtaReadableInDarkMode(origin);
+  if (result.skipped) {
+    return check("panel CTA dark mode", true, `skipped: ${result.detail}`);
+  }
+  return check("panel CTA dark mode", result.ok, result.detail);
+};
+
 const cronCheck = async (origin: string): Promise<SmokeCheck> => {
   const code = await status(
     `${origin}/cdn-cgi/handler/scheduled?cron=${encodeURIComponent("* * * * *")}`
@@ -166,7 +189,9 @@ export const smoke = async (options: SmokeOptions): Promise<SmokeCheck[]> => {
   const missing = await status(`${origin}/__smoke-test-missing-page`);
   checks.push(
     check("unknown path 404s", missing === 404, `HTTP ${missing}`),
-    ...(await imageChecks(origin, paths))
+    ...(await imageChecks(origin, paths)),
+    await panelCtaTokenCheck(origin),
+    await panelCtaDarkCheck(origin)
   );
   if (options.local) {
     checks.push(

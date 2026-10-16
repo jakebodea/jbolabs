@@ -1,10 +1,7 @@
 /**
- * Prototype (scratch branch only): geo-specific copy belongs on the About page.
+ * Geo-specific copy belongs on the About page only.
  *
  *   bun packages/config/check-locality.ts [root]
- *
- * Evidence: PR #2 added Orange County / Irvine site-wide; PR #8 reverted that
- * outside `apps/jbolabs/src/content/pages.ts` five days later.
  */
 const LOCALITY_MARKERS = [
   /\bOrange County\b/u,

@@ -2,14 +2,14 @@ import { describe, expect, it } from "vitest";
 
 import { findLocalityViolations } from "./check-locality";
 
-describe("findLocalityViolations", () => {
+describe("locality copy", () => {
   it("allows Irvine on the About copy file", () => {
     expect(
       findLocalityViolations(
         "apps/jbolabs/src/content/pages.ts",
         'const x = "Irvine";'
       )
-    ).toEqual([]);
+    ).toStrictEqual([]);
   });
 
   it("flags Irvine in other content modules", () => {
@@ -18,6 +18,13 @@ describe("findLocalityViolations", () => {
         "apps/jbolabs/src/content/home.ts",
         'tagline: "Orange County businesses"'
       )
-    ).toMatchObject([{ match: "Orange County", path: "apps/jbolabs/src/content/home.ts" }]);
+    ).toStrictEqual([
+      {
+        column: 11,
+        line: 1,
+        match: "Orange County",
+        path: "apps/jbolabs/src/content/home.ts",
+      },
+    ]);
   });
 });

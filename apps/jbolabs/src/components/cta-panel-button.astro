@@ -1,0 +1,13 @@
+---
+/** Closing CTA on `bg-panel`: always the inverse (panel) button tokens. */
+import ButtonLink from "@/components/button-link.astro";
+
+interface Props {
+  class?: string;
+  href: string;
+}
+
+const { class: className, href } = Astro.props;
+---
+
+<ButtonLink href={href} size="hero" variant="inverse" class={className}><slot /></ButtonLink>

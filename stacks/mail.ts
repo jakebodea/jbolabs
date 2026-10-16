@@ -20,6 +20,7 @@ import * as RemovalPolicy from "alchemy/RemovalPolicy";
 import { Effect } from "effect";
 
 import { accountId, mailDomains, mailflare } from "./config.ts";
+import { publishesDmarc } from "./mail-domain-flags.ts";
 
 const dist = (path: string) =>
   new URL(`../mailflare/dist/${path}`, import.meta.url).pathname;
@@ -71,7 +72,7 @@ export default Alchemy.Stack(
         name: domain.name,
         zoneId: domain.zoneId,
       }).pipe(RemovalPolicy.retain());
-      if (domain.ownsDmarc) {
+      if (publishesDmarc(domain)) {
         yield* Cloudflare.DNS.Record(`Dmarc-${id}`, {
           // Monitor first; tighten to quarantine once reports show only Cloudflare sending.
           content: '"v=DMARC1; p=none; adkim=r; aspf=r"',
